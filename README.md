@@ -9,14 +9,15 @@ v1.0.0 (March 11th, 2019)
 - APIs for handling various token related calls and queries.    
 * Created ranged_attacks.lua [scripts/ranged_attacks.lua]
 - Handles automatic ranged attack modifiers.
-- Finds ranged weapon ranges by looking up their range in the database.
--   Usable from character sheet or CT, for players and NPCs.
-- Finds actual distance betwen tokens on map, including height differences.
-- Compares weapon range to attack distance on the map.
-- Includes logic for feats that have an effect on this, the Crossbow feat and Sharpshooter feat.
-- Considers if there are active enemy in melee range (of 5'). 
-        Active meaning not suffering from the following conditions: Incapacitated, Paralyzed, Petrified, Restrained, Stunned, Unconscious.        
-        Only for medium and smaller sized tokens, 1 grid of width.
+
+* Finds ranged weapon ranges by looking up their range in the database.
+* Usable from character sheet or CT, for players and NPCs.
+* Finds actual distance betwen tokens on map, including height differences.
+* Compares weapon range to attack distance on the map.
+* Includes logic for feats that have an effect on this, the Crossbow feat and Sharpshooter feat.
+* Considers if there are active enemy in melee range (of 5'). 
+    - Active meaning not suffering from the following conditions: Incapacitated, Paralyzed, Petrified, Restrained, Stunned, Unconscious.        
+    - Only for medium and smaller sized tokens, 1 grid of width.
 - Prints out message information about the ranged attack, weapon name, ranges, actual range, conditions the attack took place under.
 * Created 5e_flanking.lua [scripts/5e_flanking.lua]
     - Automatic flanking advantage given if active ally found opposite of side of enemy the actor is attacking.
