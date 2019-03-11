@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!--	
+	Copyright (C) Styrmir, I take no liability in any negative effects the use of this extension may have on your system.
+	You are free to download and load this extension for use in your FG games, and access its API with your own extensions but modification and redistribution is prohibited.
+-->
+
+<root version="3.0" release="1">
+
+	<properties>
+		<name>Core RPG - Token Helper</name>
+		<version>1.0.0</version>
+		
+		<author>Styrmir</author>
+		<description>Core RPG - Token Helper</description>
+		
+		<ruleset>Any</ruleset>
+	</properties>
+    
+
+	<base>									
+		<script name="RangedAttack" file="scripts/ranged_attacks.lua" />	<!-- Handles ranged attack modifiers -->	
+		<script name="TokenHelper" file="scripts/token_helper.lua" />        <!-- Custom modifications and additions to the base extension -->		
+		<script name="Flanking" file="scripts/5e_flanking.lua" />			<!-- Custom script to automatically handle flanking rules -->							
+	</base>		
+
+	<announcement text="Core RPG - Token Helper" font="emotefont" icon="icon" />	
+</root>

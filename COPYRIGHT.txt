@@ -1,0 +1,8 @@
+All rights held by Styrmir Thorarinsson.
+
+You are permitted to download and use this extension with Fantasy Grounds. 
+You are allowed to use this extension with your own Fantasy Grounds extensions by connecting to the API interface of the functions within.
+
+Editing or distribution of the code is not permitted.
+
+I don't hold any responsibility for the use of this extension, its code, or any damages that might occur due to its use.
