@@ -21,6 +21,6 @@ v1.0.0 (March 11th, 2019)
 - Prints out message information about the ranged attack, weapon name, ranges, actual range, conditions the attack took place under.
 * Created 5e_flanking.lua [scripts/5e_flanking.lua]
     - Automatic flanking advantage given if active ally found opposite of side of enemy the actor is attacking.
-- Active meaning not suffering from the following conditions: Incapacitated, Paralyzed, Petrified, Restrained, Stunned, Unconscious.    
-- Prints out message notifying of a flanking melee attack if applicable.
-- Only for medium and smaller sized tokens, 1 grid of width.
+    - Active meaning not suffering from the following conditions: Incapacitated, Paralyzed, Petrified, Restrained, Stunned, Unconscious.    
+* Prints out message notifying of a flanking melee attack if applicable.
+* Only for medium and smaller sized tokens, 1 grid of width.
