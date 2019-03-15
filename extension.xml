@@ -9,9 +9,9 @@
 
 	<properties>
 		<name>Core RPG - Token Helper</name>
-		<version>1.0.0</version>
+		<version>1.1.0</version>
 		
-		<author>Styrmir</author>
+		<author>Styrmir T.</author>
 		<description>Core RPG - Token Helper</description>
 		
 		<ruleset>Any</ruleset>

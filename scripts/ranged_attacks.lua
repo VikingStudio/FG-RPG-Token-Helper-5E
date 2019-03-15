@@ -35,6 +35,12 @@ function getRangeModifier5e(rActor, rTarget, sAttackType, sWeaponName)
 		attackRange = tonumber(attackRange);
 		medRange = tonumber(medRange);
 		maxRange = tonumber(maxRange);			
+		local sRangeString = '';
+		if medRange == maxRange then
+			sRangeString = '(' .. maxRange .. ')';
+		else
+			sRangeString = '(' .. medRange .. '/' .. maxRange .. ')';		
+		end					
 
 		-- Feats 
 		-- Feat: Crossbow Expert (for PC): Being within 5 feet of a hostile creature doesn't impose disadvantage on your ranged attack rolls (while using crossbow).
@@ -68,10 +74,10 @@ function getRangeModifier5e(rActor, rTarget, sAttackType, sWeaponName)
 			if bEnemyInMeleeRange == true then
 				-- Feat: Crossbow Expert exception
 				if bCrossbowExpert then							
-					TokenHelper.postChatMessage('Ranged weapon attack with active enemy in melee range, by Crossbow Expert.');		
+					TokenHelper.postChatMessage('Ranged attack with active enemy in melee range, by Crossbow Expert.');		
 				else
 					bDis = true;
-					TokenHelper.postChatMessage('Ranged weapon attack with active enemy in melee range.');
+					TokenHelper.postChatMessage('Ranged attack with active enemy in melee range.');
 				end
 			end
 		end
@@ -83,52 +89,52 @@ function getRangeModifier5e(rActor, rTarget, sAttackType, sWeaponName)
 			bInRange = true;	
 			if bRangedMeeleModifier == 'on' then
 				if bCrossbowExpert then							
-					sMessage = 'Ranged weapon attack in melee range, by Crossbow Expert.';		
+					sMessage = 'Ranged attack in melee range, by Crossbow Expert.';		
 				else
 					bDis = true;
-					sMessage = 'Ranged weapon attack in melee range.';
+					sMessage = 'Ranged attack in melee range.';
 				end				
 			else
-				sMessage = 'Ranged weapon attack at in melee range.';
+				sMessage = 'Ranged attack at in melee range.';
 			end
 			
-			Debug.console('ranged weapon attack in melee range');	
+			Debug.console('ranged attack in melee range');	
 		end	
 
 		-- within medium range
-		if (attackRange < medRange) and (attackRange > 5) then
-			sMessage = 'Ranged weapon attack below medium range. ' .. sWeaponName .. ' (' .. medRange .. '/' .. maxRange .. ') from ' .. attackRange .. ' feet.';			
+		if (attackRange <= medRange) and (attackRange > 5) then
+			sMessage = 'Ranged attack below medium range. ' .. sWeaponName .. ' ' .. sRangeString .. ' from ' .. attackRange .. ' feet.';			
 		end
 
 		--	outside melee range with ranged weapon, below medium range	
 		if (attackRange < medRange) and (attackRange > 5) then
 			bInRange = true;			
-			Debug.console('ranged weapon within medium range, no modifier given');			
+			Debug.console('ranged within medium range, no modifier given');			
 		end		
 
 		-- attack with ranged weapon, between medium and max range	
-		if (attackRange > medRange) and (attackRange < maxRange) then
+		if (attackRange > medRange) and (attackRange <= maxRange) then
 			bInRange = true;						
 		
 			-- Feat: Sharpshooter exception
 			if bSharpShooter then				
-				sMessage = 'Ranged weapon attack between medium and maximum range by Sharpshooter. ' .. sWeaponName .. ' (' .. medRange .. '/' .. maxRange .. '), from ' .. attackRange .. ' feet.';
+				sMessage = 'Ranged attack between medium and maximum range by Sharpshooter. ' .. sWeaponName .. ' ' .. sRangeString .. ', from ' .. attackRange .. ' feet.';
 				
 				Debug.console('Ranged attack, by Sharpshooter (feat).')
 			else
 				bDis = true;
-				sMessage = 'Ranged weapon attack between medium and maximum range. ' .. sWeaponName .. ' (' .. medRange .. '/' .. maxRange .. ') from ' .. attackRange .. ' feet.';			
+				sMessage = 'Ranged attack between medium and maximum range. ' .. sWeaponName .. ' ' .. sRangeString .. ' from ' .. attackRange .. ' feet.';			
 			end					
 			
-			Debug.console('ranged weapon between medium and max range');			
+			Debug.console('ranged between medium and max range');			
 		end
 
 		-- attack with ranged weapon, beyond max range
 		if (attackRange > maxRange) then
 			bInRange = false;
-			sMessage = 'The ranged weapon attack is OUT OF RANGE and misses. ' .. sWeaponName .. ' (' .. medRange .. '/' .. maxRange .. ') from ' .. attackRange .. ' feet.';
+			sMessage = 'The ranged attack is OUT OF RANGE and misses. ' .. sWeaponName .. ' ' .. sRangeString .. ' from ' .. attackRange .. ' feet.';
 
-			Debug.console('ranged weapon outside max range');				
+			Debug.console('ranged outside max range');				
 		end			
 	end	
 
@@ -396,7 +402,7 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 
 			-- DB npc node entry structure: combattracker.list.id-00005.actions.id-00001, id-00002 .. id-0000n
 			-- npc weapon database entry in combat tracker example: combattracker.list.id-00005.actions.id-00002.value
-			local nodeName = rActor.sCreatureNode .. '.actions.id-0000' .. n;
+			local nodeName = rActor.sCreatureNode .. '.actions.id-00001';
 
 			-- iterate through the NPC actions and find the one that corresponds to the rAction.label one
 			-- finding range values if applicable
@@ -413,14 +419,30 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 					-- maxRange = after index to end
 					local index = string.find(rangeText, '/');								
 					medRange = string.sub( rangeText, 7, index - 1);
-					maxRange = string.sub(rangeText, index + 1, string.len(rangeText));
-
-					--Debug.console('rangeText NPC', rangeText, 'medRange', medRange, 'maxRange', maxRange);
+					maxRange = string.sub(rangeText, index + 1, string.len(rangeText));					
 				end
 
 				n = n + 1;
-				nodeName = rActor.sCreatureNode .. '.actions.id-0000' .. n;
+				nodeName = rActor.sCreatureNode .. '.actions' .. '.' .. getIdDBString(n);
 			end	
+
+			-- look up spells
+			n = 1;
+			nodeName = rActor.sCreatureNode .. '.spells' .. '.' .. getIdDBString(n);
+			while DB.findNode(nodeName) ~= nil do				
+				local spellName = DB.getText(nodeName .. '.' .. 'name');								
+				if ( spellName:lower() == sWeaponName:lower() ) then					
+					local description = DB.getText(nodeName .. '.' .. 'desc');					
+					-- search for 'range * ft', return range as substring, split substring in two (medium/max range)
+					-- string input ex. 'Range: 120'
+					local rangeText = string.match(description, "Range:%s%d*");																					
+					medRange = string.sub(rangeText, 8, string.len(rangeText));
+					maxRange = medRange;									
+				end
+
+				n = n + 1;
+				nodeName = rActor.sCreatureNode .. '.spells' .. '.' .. getIdDBString(n);
+			end				
 
 		-- PC handling
 		elseif (rActor.sType == 'pc') then			
@@ -428,7 +450,7 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 			-- name: .name
 			-- properties: .properties
 			-- full example: charactersheet.id-00001.weaponlist.id-00001.name.properties
-			local nodeName = rActor.sCreatureNode .. '.weaponlist.id-0000' .. n;
+			local nodeName = rActor.sCreatureNode .. '.weaponlist' .. '.' .. getIdDBString(n);
 
 			-- iterate through PC weapon entries and find the one that corresponds to the rAction.label one
 			-- finding range values if applicable
@@ -449,7 +471,23 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 				end
 
 				n = n + 1;
-				nodeName =  rActor.sCreatureNode .. '.weaponlist.id-0000' .. n;
+				nodeName =  rActor.sCreatureNode .. '.weaponlist' .. '.' .. getIdDBString(n);
+			end	
+			
+			-- look up spells
+			n = 1;
+			nodeName = rActor.sCreatureNode .. '.powers' .. '.' .. getIdDBString(n);			
+			while DB.findNode(nodeName) ~= nil do				
+				local spellName = DB.getText(nodeName .. '.' .. 'name');												
+				if ( spellName:lower() == sWeaponName:lower() ) then					
+					local description = DB.getText(nodeName .. '.' .. 'range');										
+					local rangeText = string.match(description, "%d*");																					
+					medRange = rangeText;
+					maxRange = medRange;									
+				end
+
+				n = n + 1;
+				nodeName = rActor.sCreatureNode .. '.powers' .. '.' .. getIdDBString(n);
 			end				
 		end
 
@@ -458,3 +496,18 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 	return bRanged, medRange, maxRange;
 end
 
+-- returns id-00001 formatted string
+-- use local idString = getIdDBString(n);
+-- pre: sId = 'id-'
+-- post: xml database formatted string, ex: id-00001, id-014255
+function getIdDBString(nId)
+	local sId = 'id-';
+
+	if nId < 10 then sId = sId .. '0000' .. nId; end
+	if nId < 100 and nId >= 10 then sId = sId .. '000' .. nId; end
+	if nId < 1000 and nId >= 100 then sId = sId .. '00' .. nId; end
+	if nId < 10000 and nId >= 1000 then sId = sId .. '0' .. nId; end
+	if nId >= 10000 then sId = sId .. nId; end
+
+	return sId;
+end

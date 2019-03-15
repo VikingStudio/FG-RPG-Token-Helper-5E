@@ -24,3 +24,7 @@ v1.0.0 (March 11th, 2019)
     - Active meaning not suffering from the following conditions: Incapacitated, Paralyzed, Petrified, Restrained, Stunned, Unconscious.    
 * Prints out message notifying of a flanking melee attack if applicable.
 * Only for medium and smaller sized tokens, 1 grid of width.
+
+v1.1.1 (March 15th, 2019)
+- Include medium and long range numbers cut off numbers in distance calculations (<= instead of <) [scripts/ranged_attacks: getRangeModifier5e]    
+- Automatic range modifiers code now includes ranged spells that have an Attack Roll (ATK) as well. [scripts/ranged_attacks.lua: getWeaponRanges5e]
