@@ -25,6 +25,9 @@ v1.0.0 (March 11th, 2019)
 * Prints out message notifying of a flanking melee attack if applicable.
 * Only for medium and smaller sized tokens, 1 grid of width.
 
+v1.1.0 (March 15th, 2019)
+* Include medium and long range numbers cut off numbers in distance calculations (<= instead of <) [scripts/ranged_attacks: getRangeModifier5e]    
+* Automatic range modifiers code now includes ranged spells that have an Attack Roll (ATK) as well. [scripts/ranged_attacks.lua: getWeaponRanges5e]
+
 v1.1.1 (March 15th, 2019)
-- Include medium and long range numbers cut off numbers in distance calculations (<= instead of <) [scripts/ranged_attacks: getRangeModifier5e]    
-- Automatic range modifiers code now includes ranged spells that have an Attack Roll (ATK) as well. [scripts/ranged_attacks.lua: getWeaponRanges5e]
+* Added exception for when no maps are open (theater of the mind combat), in that case no ranged or flanked logic is run. [scripts/ranged_attacks.lua: getRangeModifier5e, getRangeBetweenTokens5e | scripts/token_helper.lua: getTokenMap, isEnemyInMeleeRange5e, postChatMessage]

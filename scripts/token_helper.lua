@@ -15,6 +15,10 @@ function getTokenMap (imgCtrl)
     local gridSize = 0;
     local gridOffsetX = 0;
     local gridOffsetY = 0;
+
+    -- handle exception when no maps are used in combat, theater of the mind
+    if imgCtrl == nil then return; end
+
     if imgCtrl.hasGrid() then
         gridSize = imgCtrl.getGridSize();
         gridOffsetX, gridOffsetY = imgCtrl.getGridOffset();
@@ -135,8 +139,8 @@ end
 -- use: postChatMessage("post this text as a message to chat")
 -- pre: no message posted
 -- post: if sMessage is not empty, then paste the string to the text chat window with an icon next to it
-function postChatMessage(sMessage)
-    if sMessage ~= '' then
+function postChatMessage(sMessage)    
+    if sMessage ~= '' and sMessage ~= nil then
         local chatMessage = {font = "msgfont", icon = "roll_effect", text = sMessage};				
         Comm.deliverChatMessage(chatMessage);		
     end
@@ -235,7 +239,11 @@ function isEnemyInMeleeRange5e(aTokenMap, rActor)
 	local bEnemyInMeeleRange = false;		
 
 	-- search for tokens in the X grid range
-	local aTokensX = {};		
+    local aTokensX = {};	
+    
+    -- handle theatre of the mind exception (no map open)
+    if aTokenMap == nil then return false; end
+
 	for k,v in pairs(aTokenMap) do			
 		if 	k ~= rActor.sName then					
 			-- add to list if token found near actor token at x-grid of: x-1/x+0/x+1.

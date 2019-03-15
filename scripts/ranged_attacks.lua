@@ -29,6 +29,8 @@ function getRangeModifier5e(rActor, rTarget, sAttackType, sWeaponName)
 		bRanged, medRange, maxRange = getWeaponRanges5e(rActor, sAttackType, sWeaponName);	
 
 		local attackRange = getRangeBetweenTokens5e(rActor, rTarget, 5, 0);
+		-- handle theatre of the mind exception, no map, so exit function
+		if attackRange == false then return; end
 
 		-- check ranges and set return modifiers and variables accordingly
 		-- compare ranges to global attackRange value	
@@ -217,6 +219,10 @@ function getRangeBetweenTokens5e(rActor, rTarget, hexWidth, heightDifference)
 	
 	-- get map and grid size
 	local ctrlImage = TokenHelper.getControlImageByToken(actorToken);
+
+	-- handle exception for when map is not open (theatre of the mind combat)
+	if ctrlImage == nil then return false; end
+
 	local gridSize = ctrlImage.getGridSize();	
 		
 
