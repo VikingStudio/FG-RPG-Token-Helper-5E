@@ -16,9 +16,6 @@ function getTokenMap (imgCtrl)
     local gridOffsetX = 0;
     local gridOffsetY = 0;
 
-    -- handle exception when no maps are used in combat, theater of the mind
-    if imgCtrl == nil then return; end
-
     if imgCtrl.hasGrid() then
         gridSize = imgCtrl.getGridSize();
         gridOffsetX, gridOffsetY = imgCtrl.getGridOffset();
@@ -38,22 +35,25 @@ function getTokenMap (imgCtrl)
             local sName = DB.getValue(aEntries[i], "name", "");       
             local sFriendfoe = DB.getValue(aEntries[i], "friendfoe", "");                 
             local token = CombatManager.getTokenFromCT(aEntries[i]);
-            local x, y = token.getPosition();            
-            local nReach = DB.getValue(aEntries[i], "reach", "");   
-            local sSize = DB.getValue(aEntries[i], "size", ""); 
-            local nHeight = DB.getValue(aEntries[i], "height", "");
-            if nHeight == nil then nHeight = 0; end
-            if sSize == '' then sSize = 'Medium'; end -- PC entries don't have a 'size' entry in the <combattracker> DB section, so set them as medium by default
-            
-            local nGridx = (tonumber(x) + tonumber(gridOffsetX)) / gridSize;
-            local nGridy = (tonumber(y) + tonumber(gridOffsetY)) / gridSize;   
-            
-            local nGridxRound = round(nGridx);
-            local nGridyRound = round(nGridy);            
-            
-            -- add the map token details to the aTokenMap array
-            aTokenMap[sName] = { node = dbNode, friendfoe = sFriendfoe, gridx = tonumber(nGridxRound), gridy = tonumber(nGridyRound), reach = tonumber(nReach), size = sSize, height = tonumber(nHeight)};
-
+            -- only add CT entries that have actual tokens on the map
+            if token ~= nil then
+                local x, y = token.getPosition();            
+                local nReach = DB.getValue(aEntries[i], "reach", "");   
+                local sSize = DB.getValue(aEntries[i], "size", ""); 
+                local nHeight = DB.getValue(aEntries[i], "height", "");
+                if nHeight == nil then nHeight = 0; end
+                if sSize == '' then sSize = 'Medium'; end -- PC entries don't have a 'size' entry in the <combattracker> DB section, so set them as medium by default
+                
+                local nGridx = (tonumber(x) + tonumber(gridOffsetX)) / gridSize;
+                local nGridy = (tonumber(y) + tonumber(gridOffsetY)) / gridSize;   
+                
+                local nGridxRound = round(nGridx);
+                local nGridyRound = round(nGridy);            
+                
+                -- add the map token details to the aTokenMap array
+                aTokenMap[sName] = { node = dbNode, friendfoe = sFriendfoe, gridx = tonumber(nGridxRound), gridy = tonumber(nGridyRound), reach = tonumber(nReach), size = sSize, height = tonumber(nHeight)};
+            end
+                            
             nIndexActive = nIndexActive + 1;            
         end
     end
@@ -239,10 +239,7 @@ function isEnemyInMeleeRange5e(aTokenMap, rActor)
 	local bEnemyInMeeleRange = false;		
 
 	-- search for tokens in the X grid range
-    local aTokensX = {};	
-    
-    -- handle theatre of the mind exception (no map open)
-    if aTokenMap == nil then return false; end
+    local aTokensX = {};	        
 
 	for k,v in pairs(aTokenMap) do			
 		if 	k ~= rActor.sName then					

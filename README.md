@@ -31,3 +31,7 @@ v1.1.0 (March 15th, 2019)
 
 v1.1.1 (March 15th, 2019)
 * Added exception for when no maps are open (theater of the mind combat), in that case no ranged or flanked logic is run. [scripts/ranged_attacks.lua: getRangeModifier5e, getRangeBetweenTokens5e | scripts/token_helper.lua: getTokenMap, isEnemyInMeleeRange5e, postChatMessage]
+
+v1.1.2 (March 18th, 2019)
+* Added conditions checking function before running ranged modifier logic. This was done to cover various situations, such as when running theater of the mind combat, entries on CT but missing or no tokens on map, no map open, attacking from CT entry (without token) onto token on map, etc. [scripts/ranged_attacks.lua: checkConditions]
+* Exception added for missing token on map, that has CT entry [scripts/token_helper.lua: getTokenMap]

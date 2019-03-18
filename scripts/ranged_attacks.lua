@@ -28,9 +28,7 @@ function getRangeModifier5e(rActor, rTarget, sAttackType, sWeaponName)
 		bRanged = true;
 		bRanged, medRange, maxRange = getWeaponRanges5e(rActor, sAttackType, sWeaponName);	
 
-		local attackRange = getRangeBetweenTokens5e(rActor, rTarget, 5, 0);
-		-- handle theatre of the mind exception, no map, so exit function
-		if attackRange == false then return; end
+		local attackRange = getRangeBetweenTokens5e(rActor, rTarget, 5, 0);		
 
 		-- check ranges and set return modifiers and variables accordingly
 		-- compare ranges to global attackRange value	
@@ -207,7 +205,7 @@ function getRangeBetweenTokens5e(rActor, rTarget, hexWidth, heightDifference)
 	
 	-- get actor nodes from CT
 	local actorNode = rActor.sCTNode;
-	local targetNode = rTarget.sCTNode;	
+	local targetNode = rTarget.sCTNode;					
 
 	-- get tokens for actors from CT
 	local actorToken = CombatManager.getTokenFromCT(actorNode);
@@ -219,9 +217,6 @@ function getRangeBetweenTokens5e(rActor, rTarget, hexWidth, heightDifference)
 	
 	-- get map and grid size
 	local ctrlImage = TokenHelper.getControlImageByToken(actorToken);
-
-	-- handle exception for when map is not open (theatre of the mind combat)
-	if ctrlImage == nil then return false; end
 
 	local gridSize = ctrlImage.getGridSize();	
 		
@@ -516,4 +511,32 @@ function getIdDBString(nId)
 	if nId >= 10000 then sId = sId .. nId; end
 
 	return sId;
+end
+
+
+-- only run range function logic if this function returns true, it checks there are entries in the CT, there are tokens on map, the map is open
+-- if any of these are missing then errors will be thrown running getRangeModifer5e and the functions it relies on
+-- this occurs in various situations, such as theater of the mind, some CT entries in CT and not on map, map not open etc.
+-- use: local bConditions = checkConditions(rSourse, rTarget);
+-- pre: return true
+-- post: return false if any required condition is not met, otherwise return true 
+function checkConditions(rSource, rTarget)	
+	-- check parameters	
+	if rSource == nil or rTarget == nil then return false; end
+	
+	-- check nodes
+	local sourceNode = rSource.sCTNode;
+	local targetNode = rTarget.sCTNode;		
+	if sourceNode == nil or targetNode == nil then return false; end	
+
+	-- check for tokens on map
+	local sourceToken = CombatManager.getTokenFromCT(sourceNode);
+	local targetToken = CombatManager.getTokenFromCT(targetNode);		
+	if sourceToken == nil or targetToken == nil then return false; end
+
+	-- check for map window open
+	local ctrlImage = TokenHelper.getControlImageByToken(sourceToken);		
+	if ctrlImage == nil then return false; end
+
+	return true;
 end
