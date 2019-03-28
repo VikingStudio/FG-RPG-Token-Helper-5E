@@ -9,8 +9,15 @@ function isFlanking(rActor, rTarget)
 	local bFlanking = false;	
 
 	-- get token map and actor grid location
-	local ctrlImage = TokenHelper.getControlImageByActor(rActor);
-	local aTokenMap = TokenHelper.getTokenMap(ctrlImage);		
+	local ctrlImage = TokenHelper.getControlImageByActor(rActor);	
+	local aTokenMap;
+	-- if actor not on map then don't check for flanking
+	if (ctrlImage ~= nil) then
+		aTokenMap = TokenHelper.getTokenMap(ctrlImage);		
+	else 
+		return false;
+	end
+
 	
 	--[[
 		Design doc:
