@@ -41,3 +41,6 @@ v1.1.3 (March 28th, 2019)
 
 v1.1.3 (March 29th, 2019)
 * Version number updated to v1.1.3 in extension.xml
+
+v1.1.4 (March 29th, 2019)
+* Bugfix: If PC didn't have target and rolled melee attack while flanking enabled it would throw an error. Now returns false in that situation. [scripts/5e_flanking.lua: isFlanking]

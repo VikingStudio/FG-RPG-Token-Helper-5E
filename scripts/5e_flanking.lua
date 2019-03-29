@@ -8,6 +8,11 @@
 function isFlanking(rActor, rTarget)
 	local bFlanking = false;	
 
+	-- make sure there is an actor and target, otherwise return false
+	if rActor == nil or rTarget == nil then
+		return false;
+	end
+
 	-- get token map and actor grid location
 	local ctrlImage = TokenHelper.getControlImageByActor(rActor);	
 	local aTokenMap;

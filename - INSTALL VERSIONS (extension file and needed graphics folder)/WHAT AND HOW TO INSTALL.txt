@@ -1,4 +1,4 @@
-Extension file: "Core RPG - Token Helper v?_?_?.ext" 
+Extension file: "Core RPG - Token Helper.ext" 
 
 Includes: 
 	This is the actual extension, it includes the compressed codebase and a number of graphics.
