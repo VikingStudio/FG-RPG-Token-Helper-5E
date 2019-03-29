@@ -38,3 +38,6 @@ v1.1.2 (March 18th, 2019)
 
 v1.1.3 (March 28th, 2019)
 * Bugfix: If actor not on map flanking threw error. Fix: Flanking returns false if actor not on map. [scripts/5e_flanking.lua: isFlanking]
+
+v1.1.3 (March 29th, 2019)
+* Version number updated to v1.1.3 in extension.xml
