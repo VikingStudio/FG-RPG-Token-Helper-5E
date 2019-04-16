@@ -393,24 +393,23 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 	local medRange = 0; -- medium range
 	local maxRange = 0; -- maximum range	
 
+
 	if sRanged == 'R' then			
 		bRanged = true;			
-		local n = 1;	
 
 		-- NPC and PC db structures are different so need different handlers for finding ranges between the two		
 		-- NPC handling
-		if (rActor.sType == 'npc') then
+		if (rActor.sType == 'npc') then			
+			-- look through actions for match
+			local nodeParent = rActor.sCreatureNode .. '.actions';
+			local actionNodes = DB.getChildren(nodeParent);
 
-			-- DB npc node entry structure: combattracker.list.id-00005.actions.id-00001, id-00002 .. id-0000n
-			-- npc weapon database entry in combat tracker example: combattracker.list.id-00005.actions.id-00002.value
-			local nodeName = rActor.sCreatureNode .. '.actions.id-00001';
-
-			-- iterate through the NPC actions and find the one that corresponds to the rAction.label one
-			-- finding range values if applicable
-			while DB.findNode(nodeName) ~= nil do				
-				local weaponName = DB.getText(nodeName .. '.' .. 'name');
-				if ( weaponName:lower() == sWeaponName:lower() ) then					
-					local description = DB.getText(nodeName .. '.' .. 'desc');
+			for k, v in pairs(actionNodes) do
+				local nodeChild = nodeParent .. '.' .. k;				
+				local nodeName = DB.getText(nodeChild .. '.name');
+			
+				if ( nodeName:lower() == sWeaponName:lower() ) then					
+					local description = DB.getText(nodeChild .. '.desc');
 					
 					-- search for 'range * ft', return range as substring, split substring in two (medium/max range)
 					-- string input ex. 'Thrown (range 30/120)''  and 'range 30/120 ft.''				
@@ -419,46 +418,49 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 					-- medRange = start of numbers to before index
 					-- maxRange = after index to end
 					local index = string.find(rangeText, '/');								
-					medRange = string.sub( rangeText, 7, index - 1);
+					medRange = string.sub(rangeText, 7, index - 1);
 					maxRange = string.sub(rangeText, index + 1, string.len(rangeText));					
-				end
+				end								
+			end			
 
-				n = n + 1;
-				nodeName = rActor.sCreatureNode .. '.actions' .. '.' .. getIdDBString(n);
-			end	
-
-			-- look up spells
-			n = 1;
-			nodeName = rActor.sCreatureNode .. '.spells' .. '.' .. getIdDBString(n);
-			while DB.findNode(nodeName) ~= nil do				
-				local spellName = DB.getText(nodeName .. '.' .. 'name');								
-				if ( spellName:lower() == sWeaponName:lower() ) then					
-					local description = DB.getText(nodeName .. '.' .. 'desc');					
+			-- look through spells for match
+			nodeParent = rActor.sCreatureNode .. '.spells';
+			local spellNodes = DB.getChildren(nodeParent);
+			
+			for k, v in pairs(spellNodes) do
+				local nodeChild = nodeParent .. '.' .. k;				
+				local nodeName = DB.getText(nodeChild .. '.name');
+							
+				if ( nodeName:lower() == sWeaponName:lower() ) then					
+					local description = DB.getText(nodeChild .. '.desc');					
 					-- search for 'range * ft', return range as substring, split substring in two (medium/max range)
-					-- string input ex. 'Range: 120'
+					-- string input ex. 'Range: 120'					
 					local rangeText = string.match(description, "Range:%s%d*");																					
 					medRange = string.sub(rangeText, 8, string.len(rangeText));
 					maxRange = medRange;									
 				end
-
-				n = n + 1;
-				nodeName = rActor.sCreatureNode .. '.spells' .. '.' .. getIdDBString(n);
 			end				
+
 
 		-- PC handling
 		elseif (rActor.sType == 'pc') then			
 			-- db weapon entry on character sheet character example: charactersheet.id-00001.weaponlist.id-00001
 			-- name: .name
 			-- properties: .properties
-			-- full example: charactersheet.id-00001.weaponlist.id-00001.name.properties
-			local nodeName = rActor.sCreatureNode .. '.weaponlist' .. '.' .. getIdDBString(n);
+			-- full example: charactersheet.id-00001.weaponlist.id-00001.name.properties			
+
+			-- look through actions for match
+			local nodeParent = rActor.sCreatureNode .. '.weaponlist';
+			local actionNodes = DB.getChildren(nodeParent);
 
 			-- iterate through PC weapon entries and find the one that corresponds to the rAction.label one
 			-- finding range values if applicable
-			while DB.findNode(nodeName) ~= nil do				
-				local weaponName = DB.getText(nodeName .. '.' .. 'name');
-				if ( weaponName:lower() == sWeaponName:lower() ) then					
-					local description = DB.getText(nodeName .. '.' .. 'properties');
+			for k, v in pairs(actionNodes) do
+				local nodeChild = nodeParent .. '.' .. k;				
+				local nodeName = DB.getText(nodeChild .. '.name');
+	
+				if ( nodeName:lower() == sWeaponName:lower() ) then					
+					local description = DB.getText(nodeChild .. '.properties');
 					
 					-- search for 'range * ft', return range as substring, split substring in two (medium/max range)
 					-- string input ex. 'Thrown (range 30/120)''  and 'range 30/120 ft.''				
@@ -470,25 +472,22 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 					medRange = string.sub( rangeText, 7, index - 1);
 					maxRange = string.sub(rangeText, index + 1, string.len(rangeText));					
 				end
-
-				n = n + 1;
-				nodeName =  rActor.sCreatureNode .. '.weaponlist' .. '.' .. getIdDBString(n);
 			end	
 			
-			-- look up spells
-			n = 1;
-			nodeName = rActor.sCreatureNode .. '.powers' .. '.' .. getIdDBString(n);			
-			while DB.findNode(nodeName) ~= nil do				
-				local spellName = DB.getText(nodeName .. '.' .. 'name');												
-				if ( spellName:lower() == sWeaponName:lower() ) then					
-					local description = DB.getText(nodeName .. '.' .. 'range');										
+			-- look through spells for match
+			nodeParent = rActor.sCreatureNode .. '.powers';
+			local spellNodes = DB.getChildren(nodeParent);
+			
+			for k, v in pairs(spellNodes) do
+				local nodeChild = nodeParent .. '.' .. k;				
+				local nodeName = DB.getText(nodeChild .. '.name');
+														
+				if ( nodeName:lower() == sWeaponName:lower() ) then					
+					local description = DB.getText(nodeChild .. '.range');										
 					local rangeText = string.match(description, "%d*");																					
 					medRange = rangeText;
 					maxRange = medRange;									
 				end
-
-				n = n + 1;
-				nodeName = rActor.sCreatureNode .. '.powers' .. '.' .. getIdDBString(n);
 			end				
 		end
 
@@ -497,6 +496,9 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 	return bRanged, medRange, maxRange;
 end
 
+
+-- RETIRED IN PREFERENCE TO: DB.getChildren(), deleting items from the db iterated list does not update the index numbers, so iteration that expects a non-broken 
+-- continual iteration will break once there is a gap in the count due to a deleted item from said list
 -- returns id-00001 formatted string
 -- use local idString = getIdDBString(n);
 -- pre: sId = 'id-'

@@ -44,3 +44,6 @@ v1.1.3 (March 29th, 2019)
 
 v1.1.4 (March 29th, 2019)
 * Bugfix: If PC didn't have target and rolled melee attack while flanking enabled it would throw an error. Now returns false in that situation. [scripts/5e_flanking.lua: isFlanking]
+
+v1.1.5 (April 16th, 2019)
+* Bugfix: If weapon or spell was deleted from the actions tab, the range finder would break at that point as there would be a gap in the iteration numbers. Fix: DB.getChildren used instead of manual iterator. [scripts/ranged_attacks.lua: getWeaponRanges5e]
