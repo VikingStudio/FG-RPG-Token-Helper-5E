@@ -7,7 +7,7 @@
 -- post: returns true if  actor has a flanking attack on target flanking, else false
 function isFlanking(rActor, rTarget)
 	local bFlanking = false;	
-
+	
 	-- make sure there is an actor and target, otherwise return false
 	if rActor == nil or rTarget == nil then
 		return false;
@@ -40,16 +40,19 @@ function isFlanking(rActor, rTarget)
 		If such an ally is fund, return bFlanking as true (take that result and apply an advantage outside of this function if appropriate)
 	]]--
 
-	-- find attack direction
-	local actorX = aTokenMap[rActor.sName].gridx;
-	local actorY = aTokenMap[rActor.sName].gridy;
-	local targetX = aTokenMap[rTarget.sName].gridx;
-	local targetY = aTokenMap[rTarget.sName].gridy;
+	-- find attack direction	
+	local sActorPath = DB.getPath(rActor.sCTNode);
+	local sTargetPath = DB.getPath(rTarget.sCTNode);
+
+	local actorX = aTokenMap[sActorPath].gridx;
+	local actorY = aTokenMap[sActorPath].gridy;
+	local targetX = aTokenMap[sTargetPath].gridx;
+	local targetY = aTokenMap[sTargetPath].gridy;
 	
 	
 	-- determine direction of attack and set sDirection to N, NE, E, SE, S, SW, W, NW.
 	local sDirection;
-	if aTokenMap[rTarget.sName].size == 'Medium' or aTokenMap[rTarget.sName].size == 'Small' or aTokenMap[rTarget.sName].size == 'Tiny' then
+	if aTokenMap[sTargetPath].size == 'Medium' or aTokenMap[sTargetPath].size == 'Small' or aTokenMap[sTargetPath].size == 'Tiny' then
 		if (actorX == targetX) and (actorY == targetY + 1) then sDirection = 'N'; end
 		if (actorX == targetX - 1) and (actorY == targetY + 1) then sDirection = 'NE'; end	
 		if (actorX == targetX - 1) and (actorY == targetY) then sDirection = 'E'; end
@@ -59,28 +62,30 @@ function isFlanking(rActor, rTarget)
 		if (actorX == targetX + 1) and (actorY == targetY) then sDirection = 'W'; end					
 		if (actorX == targetX + 1) and (actorY == targetY + 1) then sDirection = 'NW'; end												 
 	end
-	if aTokenMap[rTarget.sName].size == 'Large' then
+	if aTokenMap[sTargetPath].size == 'Large' then
 	end	
 
 	-- search for ally
-	local sAllyName = '';
-	if aTokenMap[rTarget.sName].size == 'Medium' or aTokenMap[rTarget.sName].size == 'Small' or aTokenMap[rTarget.sName].size == 'Tiny' then	
-		if sDirection == 'N' then sAllyName = TokenHelper.getActorByGrid(aTokenMap, targetX, targetY - 1);	end
-		if sDirection == 'NE' then sAllyName = TokenHelper.getActorByGrid(aTokenMap, targetX + 1, targetY - 1); end
-		if sDirection == 'E' then sAllyName = TokenHelper.getActorByGrid(aTokenMap, targetX + 1, targetY);	end
-		if sDirection == 'SE' then sAllyName = TokenHelper.getActorByGrid(aTokenMap, targetX + 1, targetY + 1); end
-		if sDirection == 'S' then sAllyName = TokenHelper.getActorByGrid(aTokenMap, targetX, targetY + 1);	end
-		if sDirection == 'SW' then sAllyName = TokenHelper.getActorByGrid(aTokenMap, targetX - 1, targetY + 1); end
-		if sDirection == 'W' then sAllyName = TokenHelper.getActorByGrid(aTokenMap, targetX - 1, targetY);	end
-		if sDirection == 'NW' then sAllyName = TokenHelper.getActorByGrid(aTokenMap, targetX - 1, targetY - 1); end
+	local sAllyPath = '';
+	if aTokenMap[sTargetPath].size == 'Medium' or aTokenMap[sTargetPath].size == 'Small' or aTokenMap[sTargetPath].size == 'Tiny' then	
+		if sDirection == 'N' then sAllyPath = TokenHelper.getActorByGrid(aTokenMap, targetX, targetY - 1);	end
+		if sDirection == 'NE' then sAllyPath = TokenHelper.getActorByGrid(aTokenMap, targetX + 1, targetY - 1); end
+		if sDirection == 'E' then sAllyPath = TokenHelper.getActorByGrid(aTokenMap, targetX + 1, targetY);	end
+		if sDirection == 'SE' then sAllyPath = TokenHelper.getActorByGrid(aTokenMap, targetX + 1, targetY + 1); end
+		if sDirection == 'S' then sAllyPath = TokenHelper.getActorByGrid(aTokenMap, targetX, targetY + 1);	end
+		if sDirection == 'SW' then sAllyPath = TokenHelper.getActorByGrid(aTokenMap, targetX - 1, targetY + 1); end
+		if sDirection == 'W' then sAllyPath = TokenHelper.getActorByGrid(aTokenMap, targetX - 1, targetY);	end
+		if sDirection == 'NW' then sAllyPath = TokenHelper.getActorByGrid(aTokenMap, targetX - 1, targetY - 1); end
 	end
 	
 	-- get ally CT entry
 	local allyNodePath = '';
 	local aEntries = CombatManager.getSortedCombatantList();	    	
 	local nIndexActive = 0;	
-    for i = nIndexActive + 1, #aEntries do                           
-        if DB.getText(aEntries[i], 'name') == sAllyName then allyNodePath = aEntries[i]; end				
+	for i = nIndexActive + 1, #aEntries do     
+		local entryNodePath = DB.getPath(aEntries[i]);
+
+        if entryNodePath == sAllyPath then allyNodePath = entryNodePath; end				
 		nIndexActive = nIndexActive + 1;     
 	end	
 
@@ -103,13 +108,13 @@ function isFlanking(rActor, rTarget)
 	local bOutOfRange = false;
 	if (math.sqrt(actorHeight^2 - targetHeight^2) > 5) or (math.sqrt(allyHeight^2 - targetHeight^2) > 5) then bOutOfRange = true; end				
 
-	local actorFriendFoe = aTokenMap[rActor.sName].friendfoe;
+	local actorFriendFoe = aTokenMap[sActorPath].friendfoe;
 	local allyFriendFoe = '';
-	if sAllyName ~= '' then allyFriendFoe = aTokenMap[sAllyName].friendfoe; end
+	if sAllyPath ~= '' then allyFriendFoe = aTokenMap[sAllyPath].friendfoe; end
 	
 	-- set bFlanking=true, if a flanking ally is found that is not unconscious/paralyzed/petrified/prone/stunned/restrained
 	if actorFriendFoe == allyFriendFoe then 	
-		local node = aTokenMap[sAllyName].node;
+		local node = aTokenMap[sAllyPath].node;
 		local bAllyDisabled = TokenHelper.isActorDisabled5e(node);
 		if (bAllyDisabled == false) and (allyNodePath ~= '')
 		then

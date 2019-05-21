@@ -47,3 +47,6 @@ v1.1.4 (March 29th, 2019)
 
 v1.1.5 (April 16th, 2019)
 * Bugfix: If weapon or spell was deleted from the actions tab, the range finder would break at that point as there would be a gap in the iteration numbers. Fix: DB.getChildren used instead of manual iterator. [scripts/ranged_attacks.lua: getWeaponRanges5e]
+
+v1.1.6 (Mai 21st, 2019)
+* Bugfix: Flanking and ranged attacks didn't work if the target was 'Unidentified" / not named. This is because the DB looked up search by name. Now searching for CT entry nodepath. [scripts/token_helper.lua: getTokenMap, getActorByGrid, getActorIndexInTokenMap | scripts/5e_flanking.lua: isFlanking | scripts/ranged_attacks.lua: isEnemyInMeleeRange5e]

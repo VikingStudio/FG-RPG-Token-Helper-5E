@@ -4,7 +4,7 @@
 -- creates and returns an array containing token objects for comparing grid position of tokens
 -- use: local aTokenMap = getTokenMap(imagecontrol)
 -- pre: empty tokenMap
--- post: returns aTokenMap[sName]{friendfoe, gridx, gridy, reach, size}, that contains positional and disposition (friend/foe/neutral) of all actors in the CT ;
+-- post: returns aTokenMap[node]{name, friendfoe, gridx, gridy, reach, size}, that contains positional and disposition (friend/foe/neutral) of all actors in the CT ;
 function getTokenMap (imgCtrl)      
     local aTokenMap = {}
         
@@ -31,16 +31,16 @@ function getTokenMap (imgCtrl)
         -- loop through CT entries, compare reach of foes to active token position and set bEnemy to true if within melee ranged and not unconscious
         local nIndexActive = 0;
         for i = nIndexActive + 1, #aEntries do                   
-            local dbNode = aEntries[i];     
-            local sName = DB.getValue(aEntries[i], "name", "");       
-            local sFriendfoe = DB.getValue(aEntries[i], "friendfoe", "");                 
-            local token = CombatManager.getTokenFromCT(aEntries[i]);
+            local node = aEntries[i];     
+            local sName = DB.getValue(node, "name", "");       
+            local sFriendfoe = DB.getValue(node, "friendfoe", "");                 
+            local token = CombatManager.getTokenFromCT(node);
             -- only add CT entries that have actual tokens on the map
             if token ~= nil then
                 local x, y = token.getPosition();            
-                local nReach = DB.getValue(aEntries[i], "reach", "");   
-                local sSize = DB.getValue(aEntries[i], "size", ""); 
-                local nHeight = DB.getValue(aEntries[i], "height", "");
+                local nReach = DB.getValue(node, "reach", "");   
+                local sSize = DB.getValue(node, "size", ""); 
+                local nHeight = DB.getValue(node, "height", "");
                 if nHeight == nil then nHeight = 0; end
                 if sSize == '' then sSize = 'Medium'; end -- PC entries don't have a 'size' entry in the <combattracker> DB section, so set them as medium by default
                 
@@ -48,16 +48,16 @@ function getTokenMap (imgCtrl)
                 local nGridy = (tonumber(y) + tonumber(gridOffsetY)) / gridSize;   
                 
                 local nGridxRound = round(nGridx);
-                local nGridyRound = round(nGridy);            
-                
-                -- add the map token details to the aTokenMap array
-                aTokenMap[sName] = { node = dbNode, friendfoe = sFriendfoe, gridx = tonumber(nGridxRound), gridy = tonumber(nGridyRound), reach = tonumber(nReach), size = sSize, height = tonumber(nHeight)};
+                local nGridyRound = round(nGridy);                                                     
+
+                -- add the map token details to the aTokenMap array                
+                aTokenMap[DB.getPath(node)] = { name = sName, friendfoe = sFriendfoe, gridx = tonumber(nGridxRound), gridy = tonumber(nGridyRound), reach = tonumber(nReach), size = sSize, height = tonumber(nHeight)};
             end
                             
             nIndexActive = nIndexActive + 1;            
         end
     end
-
+    
     return aTokenMap;
 end
 
@@ -94,13 +94,13 @@ end
 -- pre: sActorName = ''
 -- post: returns found sActorName in the token map for that grid if any, otherwise return empty string
 function getActorByGrid(aTokenMap, x, y)
-    local sActorName = '';
+    local sActorNode = '';
 
     for k, v in pairs(aTokenMap) do                
-        if v.gridx == x and v.gridy == y then sActorName = k; end        
+        if v.gridx == x and v.gridy == y then sActorNode = k; end        
     end    
         
-    return sActorName;
+    return sActorNode;
 end
 
 
@@ -155,7 +155,7 @@ function getActorSize(rActor)
     local sSize = 'Medium';
     
     -- DB npc node entry structure: combattracker.list.id-00005.size or charactersheet.id-00001.size
-    local nodeName = rActor.sCreatureNode .. '.size';    --rActor.sCTNode
+    local nodeName = rActor.sCTNode .. '.size';    --rActor.sCTNode
     
     if DB.findNode(nodeName) ~= nil then
         sSize = DB.getText(nodeName);
@@ -173,7 +173,7 @@ function getActorReach(rActor)
     local nReach = 5;
     
     -- DB npc node entry structure: combattracker.list.id-00005.reach or charactersheet.id-00001.reach
-    local nodeName = rActor.sCreatureNode .. '.reach';    --rActor.sCTNode
+    local nodeName = rActor.sCTNode .. '.reach';    --rActor.sCTNode
     
     if DB.findNode(nodeName) ~= nil then
     nReach = DB.getValue(nodeName);
@@ -237,14 +237,15 @@ end
 -- post: returns true if enemy found in CT within 5' that is not unconscious or otherwise unable to act, otherwise return false	
 function isEnemyInMeleeRange5e(aTokenMap, rActor)	
 	local bEnemyInMeeleRange = false;		
-
+	local sActorPath = DB.getPath(rActor.sCTNode);    
+    
 	-- search for tokens in the X grid range
     local aTokensX = {};	        
 
 	for k,v in pairs(aTokenMap) do			
-		if 	k ~= rActor.sName then					
+		if 	k ~= sActorPath then					
 			-- add to list if token found near actor token at x-grid of: x-1/x+0/x+1.
-			if (aTokenMap[rActor.sName].gridx == v.gridx - 1) or (aTokenMap[rActor.sName].gridx == v.gridx) or (aTokenMap[rActor.sName].gridx == v.gridx + 1) then				
+			if (aTokenMap[sActorPath].gridx == v.gridx - 1) or (aTokenMap[sActorPath].gridx == v.gridx) or (aTokenMap[sActorPath].gridx == v.gridx + 1) then				
 				aTokensX[k] = {node = v.node, friendfoe = v.friendfoe, gridx = v.gridx, gridy = v.gridy, reach = v.reach, size = v.size, height = v.height};				
 			end				
 		end	  	
@@ -254,7 +255,7 @@ function isEnemyInMeleeRange5e(aTokenMap, rActor)
 	local aTokensXandY = {};	
 	for k, v in pairs(aTokensX) do		
 		-- add to list if token found near actor token at y-grid of: y-1/y+0/y+1.
-		if (aTokenMap[rActor.sName].gridy == v.gridy - 1) or (aTokenMap[rActor.sName].gridy == v.gridy) or (aTokenMap[rActor.sName].gridy == v.gridy + 1) then				
+		if (aTokenMap[sActorPath].gridy == v.gridy - 1) or (aTokenMap[sActorPath].gridy == v.gridy) or (aTokenMap[sActorPath].gridy == v.gridy + 1) then				
 			aTokensXandY[k] = {node = v.node, friendfoe = v.friendfoe, gridx = v.gridx, gridy = v.gridy, reach = v.reach, size = v.size, height = v.height};				
 		end				
 	end	
@@ -262,13 +263,13 @@ function isEnemyInMeleeRange5e(aTokenMap, rActor)
 	
 	for k, v in pairs(aTokensXandY) do			
 		-- check if tokens are foes (friend vs foe, or foe vs friend), neutral are ignored
-		if (aTokenMap[rActor.sName].friendfoe ~= v.friendfoe and v.friendfoe ~= 'neutral' and v.friendfoe ~= '') then    -- '' is for faction (friend/foe/neutral/faction)
+		if (aTokenMap[sActorPath].friendfoe ~= v.friendfoe and v.friendfoe ~= 'neutral' and v.friendfoe ~= '') then    -- '' is for faction (friend/foe/neutral/faction)
 			-- check if unconscious and other conditions that might make a foe unable to act normally                   
             local enemyCTNode = ActorManager.getActorFromCT(v.node);            
             local isEnemyDisabled = isActorDisabled5e(enemyCTNode);
 			if isEnemyDisabled == false then						
 				-- if not disabled finally check for altitude difference, if within range then enemy is found within range
-				if (aTokenMap[rActor.sName].height <= v.height + 5) and (aTokenMap[rActor.sName].height >= v.height - 5) then
+				if (aTokenMap[sActorPath].height <= v.height + 5) and (aTokenMap[sActorPath].height >= v.height - 5) then
 					bEnemyInMeeleRange = true;		
 				end
 			end		
