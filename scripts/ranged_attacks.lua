@@ -410,16 +410,29 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 			
 				if ( nodeName:lower() == sWeaponName:lower() ) then					
 					local description = DB.getText(nodeChild .. '.desc');
+										
+					-- search for 'range * ft', return range as substring, split substring in two (medium/max range)					
+					-- string input ex. 'Thrown (range 30/120)''  and 'range 30/120 ft.''	
+					local rangeText = '';
+					rangeText = string.match(description, "range%s%d*/%d*");
 					
-					-- search for 'range * ft', return range as substring, split substring in two (medium/max range)
-					-- string input ex. 'Thrown (range 30/120)''  and 'range 30/120 ft.''				
-					local rangeText = string.match(description, "range%s%d*/%d*");
-					-- find '/' index
-					-- medRange = start of numbers to before index
-					-- maxRange = after index to end
-					local index = string.find(rangeText, '/');								
-					medRange = string.sub(rangeText, 7, index - 1);
-					maxRange = string.sub(rangeText, index + 1, string.len(rangeText));					
+					if rangeText ~= nil then						
+						-- find '/' index
+						-- medRange = start of numbers to before index
+						-- maxRange = after index to end
+						local index = string.find(rangeText, '/');								
+						medRange = string.sub(rangeText, 7, index - 1);
+						maxRange = string.sub(rangeText, index + 1, string.len(rangeText));								
+					else
+						-- this exception is needed as some modules have a slightly different range entries
+						-- string input ex. 'Thrown (range 30 ft./120)''  and 'range 30 ft./120 ft.''	
+						rangeText = string.match(description, "range%s%d*%sft./%d*");
+						local index = string.find(rangeText, '/');								
+						medRange = string.sub(rangeText, 7, index - 4);
+						maxRange = string.sub(rangeText, index + 1, string.len(rangeText));		
+					end
+					Debug.chat('rangeText', rangeText)	
+					Debug.chat('medRange, maxRange', medRange, maxRange)		
 				end								
 			end			
 
@@ -464,7 +477,7 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 					
 					-- search for 'range * ft', return range as substring, split substring in two (medium/max range)
 					-- string input ex. 'Thrown (range 30/120)''  and 'range 30/120 ft.''				
-					local rangeText = string.match(description, "range%s%d*/%d*");
+					local rangeText = string.match(description, "range%s%d*/%d*");				
 					-- find '/' index
 					-- medRange = start of numbers to before index
 					-- maxRange = after index to end

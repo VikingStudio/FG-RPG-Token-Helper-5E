@@ -50,3 +50,6 @@ v1.1.5 (April 16th, 2019)
 
 v1.1.6 (May 21st, 2019)
 * Bugfix: Flanking and ranged attacks didn't work if the target was 'Unidentified" / not named. This is because the DB looked up search by name. Now searching for CT entry nodepath. [scripts/token_helper.lua: getTokenMap, getActorByGrid, getActorIndexInTokenMap | scripts/5e_flanking.lua: isFlanking | scripts/ranged_attacks.lua: isEnemyInMeleeRange5e]
+
+v1.1.7 (June 1st, 2019)
+* In certain modules the parsing code broke due to an extra 'ft.' in front of the '/' in the range text. Exception added. [scripts/ranged_attacks.lua: getWeaponRanges5e]
