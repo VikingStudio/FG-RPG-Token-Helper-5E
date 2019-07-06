@@ -235,18 +235,17 @@ end
 -- use: local bMeleeRangedEnemies = isEnemyInMeleeRange5e(rActor, n), where n is altitude difference if any between the actor and enemy in feet
 -- pre: return false
 -- post: returns true if enemy found in CT within 5' that is not unconscious or otherwise unable to act, otherwise return false	
-function isEnemyInMeleeRange5e(aTokenMap, rActor)	
+function isEnemyInMeleeRange5e(aTokenMap, rActor)	   
 	local bEnemyInMeeleRange = false;		
 	local sActorPath = DB.getPath(rActor.sCTNode);    
     
 	-- search for tokens in the X grid range
     local aTokensX = {};	        
-
 	for k,v in pairs(aTokenMap) do			
 		if 	k ~= sActorPath then					
 			-- add to list if token found near actor token at x-grid of: x-1/x+0/x+1.
 			if (aTokenMap[sActorPath].gridx == v.gridx - 1) or (aTokenMap[sActorPath].gridx == v.gridx) or (aTokenMap[sActorPath].gridx == v.gridx + 1) then				
-				aTokensX[k] = {node = v.node, friendfoe = v.friendfoe, gridx = v.gridx, gridy = v.gridy, reach = v.reach, size = v.size, height = v.height};				
+				aTokensX[k] = {friendfoe = v.friendfoe, gridx = v.gridx, gridy = v.gridy, reach = v.reach, size = v.size, height = v.height};				
 			end				
 		end	  	
 	end
@@ -256,7 +255,7 @@ function isEnemyInMeleeRange5e(aTokenMap, rActor)
 	for k, v in pairs(aTokensX) do		
 		-- add to list if token found near actor token at y-grid of: y-1/y+0/y+1.
 		if (aTokenMap[sActorPath].gridy == v.gridy - 1) or (aTokenMap[sActorPath].gridy == v.gridy) or (aTokenMap[sActorPath].gridy == v.gridy + 1) then				
-			aTokensXandY[k] = {node = v.node, friendfoe = v.friendfoe, gridx = v.gridx, gridy = v.gridy, reach = v.reach, size = v.size, height = v.height};				
+			aTokensXandY[k] = {friendfoe = v.friendfoe, gridx = v.gridx, gridy = v.gridy, reach = v.reach, size = v.size, height = v.height};				
 		end				
 	end	
 		
@@ -264,9 +263,11 @@ function isEnemyInMeleeRange5e(aTokenMap, rActor)
 	for k, v in pairs(aTokensXandY) do			
 		-- check if tokens are foes (friend vs foe, or foe vs friend), neutral are ignored
 		if (aTokenMap[sActorPath].friendfoe ~= v.friendfoe and v.friendfoe ~= 'neutral' and v.friendfoe ~= '') then    -- '' is for faction (friend/foe/neutral/faction)
-			-- check if unconscious and other conditions that might make a foe unable to act normally                   
-            local enemyCTNode = ActorManager.getActorFromCT(v.node);            
+            -- check if unconscious and other conditions that might make a foe unable to act normally     
+                       
+            local enemyCTNode = ActorManager.getActorFromCT(k);                                
             local isEnemyDisabled = isActorDisabled5e(enemyCTNode);
+            
 			if isEnemyDisabled == false then						
 				-- if not disabled finally check for altitude difference, if within range then enemy is found within range
 				if (aTokenMap[sActorPath].height <= v.height + 5) and (aTokenMap[sActorPath].height >= v.height - 5) then
@@ -285,9 +286,10 @@ end
 -- pre: bDisabled = false
 -- post: bDisabled = true or false depending on if actor is unable to attack due to a condition
 function isActorDisabled5e (nodeCT)
-	local bDisabled = false;
+	local bDisabled = false;            
 
-	local actor = ActorManager.getActorFromCT(nodeCT);
+    local actor = ActorManager.getActorFromCT(nodeCT.sCTNode);    
+        
 	if EffectManager5E.hasEffectCondition(actor, "Incapacitated") or EffectManager5E.hasEffectCondition(actor, "Paralyzed") 
 		or EffectManager5E.hasEffectCondition(actor, "Petrified") or EffectManager5E.hasEffectCondition(actor, "Restrained")
 		or EffectManager5E.hasEffectCondition(actor, "Stunned") or EffectManager5E.hasEffectCondition(actor, "Unconscious")	

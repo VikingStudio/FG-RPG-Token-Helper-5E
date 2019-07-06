@@ -53,3 +53,7 @@ v1.1.6 (May 21st, 2019)
 
 v1.1.7 (June 1st, 2019)
 * In certain modules the parsing code broke due to an extra 'ft.' in front of the '/' in the range text. Exception added. [scripts/ranged_attacks.lua: getWeaponRanges5e]
+
+v1.1.8 (July 6th, 2019)
+* Bugfix: Ranged attacks within melee range now consider conditions properly. Considers the following conditions: Incapacitated, Paralyzed, Petrified, Restrained, Stunned, Unconscious [scripts/tokenHelper: isEnemyInMeleeRange5e, isActorDisabled5e]
+* Bugfix: Flanking code had to be changed to work with the above. [scripts/5e_flanking.lua: isFlanking]

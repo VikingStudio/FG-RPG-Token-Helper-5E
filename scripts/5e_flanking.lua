@@ -113,9 +113,8 @@ function isFlanking(rActor, rTarget)
 	if sAllyPath ~= '' then allyFriendFoe = aTokenMap[sAllyPath].friendfoe; end
 	
 	-- set bFlanking=true, if a flanking ally is found that is not unconscious/paralyzed/petrified/prone/stunned/restrained
-	if actorFriendFoe == allyFriendFoe then 	
-		local node = aTokenMap[sAllyPath].node;
-		local bAllyDisabled = TokenHelper.isActorDisabled5e(node);
+	if actorFriendFoe == allyFriendFoe then 			
+		local bAllyDisabled = TokenHelper.isActorDisabled5e(sAllyPath);
 		if (bAllyDisabled == false) and (allyNodePath ~= '')
 		then
 			bFlanking = true;

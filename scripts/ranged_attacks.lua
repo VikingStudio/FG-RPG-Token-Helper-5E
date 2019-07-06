@@ -430,9 +430,7 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 						local index = string.find(rangeText, '/');								
 						medRange = string.sub(rangeText, 7, index - 4);
 						maxRange = string.sub(rangeText, index + 1, string.len(rangeText));		
-					end
-					Debug.chat('rangeText', rangeText)	
-					Debug.chat('medRange, maxRange', medRange, maxRange)		
+					end	
 				end								
 			end			
 
