@@ -444,8 +444,7 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 					rangeText = string.match(description, "range%s%d*");
 					if rangeText ~= nil then					
 						medRange = string.sub(rangeText, 7, string.len(rangeText));
-						maxRange = medRange;	
-						Debug.chat('spell version 1', rangeText, medRange, maxRange);
+						maxRange = medRange;							
 					end	
 				end								
 			end			
@@ -467,7 +466,7 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 					maxRange = medRange;									
 				end
 			end	
-			
+
 
 		-- PC handling
 		elseif (rActor.sType == 'pc') then			
