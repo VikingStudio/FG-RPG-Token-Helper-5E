@@ -57,3 +57,6 @@ v1.1.7 (June 1st, 2019)
 v1.1.8 (July 6th, 2019)
 * Bugfix: Ranged attacks within melee range now consider conditions properly. Considers the following conditions: Incapacitated, Paralyzed, Petrified, Restrained, Stunned, Unconscious [scripts/tokenHelper: isEnemyInMeleeRange5e, isActorDisabled5e]
 * Bugfix: Flanking code had to be changed to work with the above. [scripts/5e_flanking.lua: isFlanking]
+
+v1.1.9 (February, 22nd, 2020)
+- Fixed bug for when spell entries were added under actions (rather than spell section) for NPCs' in the DB. This would cause the automatic range finding logic not to work.
