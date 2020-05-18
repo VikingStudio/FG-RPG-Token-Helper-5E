@@ -413,6 +413,7 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 				if ( nodeName:lower() == sWeaponName:lower() ) then					
 					local description = DB.getText(nodeChild .. '.desc');										
 					local rangeText = '';
+					local rangeFound = false;
 
 					-- Weapon version 1		
 					-- search for 'range * ft', return range as substring, split substring in two (medium/max range)					
@@ -424,17 +425,19 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 						-- maxRange = after index to end
 						local index = string.find(rangeText, '/');								
 						medRange = string.sub(rangeText, 7, index - 1);
-						maxRange = string.sub(rangeText, index + 1, string.len(rangeText));			
+						maxRange = string.sub(rangeText, index + 1, string.len(rangeText));
+						rangeFound = true;
 					end
 
 					-- Weapon version 2
 					-- this exception is needed as some modules have a slightly different range entries
 					-- string input ex. 'Thrown (range 30 ft./120)''  and 'range 30 ft./120 ft.''	
 					rangeText = string.match(description, "range%s%d*%sft./%d*");
-					if rangeText ~= nil then						
+					if rangeText ~= nil and rangeFound == false then						
 						local index = string.find(rangeText, '/');								
 						medRange = string.sub(rangeText, 7, index - 4);
-						maxRange = string.sub(rangeText, index + 1, string.len(rangeText));	
+						maxRange = string.sub(rangeText, index + 1, string.len(rangeText));
+						rangeFound = true;
 					end
 						
 					-- Spell action version 1
@@ -442,7 +445,7 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 					-- where spell entries on NPCs are put under actions, and only one range is available
 					-- string input ex. 'Ranged Spell Attack: +5 to hit, range 150 ft., one target. Hit: 10 (3d6) fire damage. ...'		
 					rangeText = string.match(description, "range%s%d*");
-					if rangeText ~= nil then					
+					if rangeText ~= nil and rangeFound == false then					
 						medRange = string.sub(rangeText, 7, string.len(rangeText));
 						maxRange = medRange;							
 					end	
