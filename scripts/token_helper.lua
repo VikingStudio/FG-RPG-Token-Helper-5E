@@ -288,7 +288,7 @@ end
 function isActorDisabled5e (nodeCT)
 	local bDisabled = false;            
 
-    local actor = ActorManager.getActorFromCT(nodeCT.sCTNode);    
+    local actor = ActorManager.getActorFromCT(nodeCT);
         
 	if EffectManager5E.hasEffectCondition(actor, "Incapacitated") or EffectManager5E.hasEffectCondition(actor, "Paralyzed") 
 		or EffectManager5E.hasEffectCondition(actor, "Petrified") or EffectManager5E.hasEffectCondition(actor, "Restrained")
