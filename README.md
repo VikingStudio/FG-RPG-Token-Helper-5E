@@ -3,7 +3,7 @@ Fantasy Grounds Extension that has helper APIs for handling Tokens and their ran
 
 ## License
 
-This project is licensed under private License - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under private License.
 The license is held by Styrmir Thorarinsson and some proprietary code supplied by SmiteWorks.
 
 This license extends to all use or inspiration of the whole or part of its work and code.
