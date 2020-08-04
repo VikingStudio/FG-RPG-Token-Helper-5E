@@ -34,7 +34,8 @@ function getRangeModifier5e(rActor, rTarget, sAttackType, sWeaponName)
 		-- compare ranges to global attackRange value	
 		attackRange = tonumber(attackRange);
 		medRange = tonumber(medRange);
-		maxRange = tonumber(maxRange);			
+		maxRange = tonumber(maxRange);
+		
 		local sRangeString = '';
 		if medRange == maxRange then
 			sRangeString = '(' .. maxRange .. ')';
@@ -414,6 +415,17 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 					local description = DB.getText(nodeChild .. '.desc');										
 					local rangeText = '';
 					local rangeFound = false;
+						
+					-- Spell action version 1
+					-- this exception is needed as some modules have a slightly different range entries
+					-- where spell entries on NPCs are put under actions, and only one range is available
+					-- string input ex. 'Ranged Spell Attack: +5 to hit, range 150 ft., one target. Hit: 10 (3d6) fire damage. ...'		
+					rangeText = string.match(description, "range%s%d+");
+					
+					if rangeText ~= nil and rangeFound == false then					
+						medRange = string.sub(rangeText, 7, string.len(rangeText));
+						maxRange = medRange;							
+					end	
 
 					-- Weapon version 1		
 					-- search for 'range * ft', return range as substring, split substring in two (medium/max range)					
@@ -439,16 +451,6 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 						maxRange = string.sub(rangeText, index + 1, string.len(rangeText));
 						rangeFound = true;
 					end
-						
-					-- Spell action version 1
-					-- this exception is needed as some modules have a slightly different range entries
-					-- where spell entries on NPCs are put under actions, and only one range is available
-					-- string input ex. 'Ranged Spell Attack: +5 to hit, range 150 ft., one target. Hit: 10 (3d6) fire damage. ...'		
-					rangeText = string.match(description, "range%s%d*");
-					if rangeText ~= nil and rangeFound == false then					
-						medRange = string.sub(rangeText, 7, string.len(rangeText));
-						maxRange = medRange;							
-					end	
 				end								
 			end			
 
@@ -493,7 +495,8 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 					
 					-- search for 'range * ft', return range as substring, split substring in two (medium/max range)
 					-- string input ex. 'Thrown (range 30/120)''  and 'range 30/120 ft.''				
-					local rangeText = string.match(description, "range%s%d*/%d*");				
+					local rangeText = string.match(description, "range%s%d*/%d*");
+										
 					-- find '/' index
 					-- medRange = start of numbers to before index
 					-- maxRange = after index to end
@@ -509,11 +512,19 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 			
 			for k, v in pairs(spellNodes) do
 				local nodeChild = nodeParent .. '.' .. k;				
-				local nodeName = DB.getText(nodeChild .. '.name');
-														
+				local nodeName = DB.getText(nodeChild .. '.name');						
 				if ( nodeName:lower() == sWeaponName:lower() ) then					
 					local description = DB.getText(nodeChild .. '.range');										
-					local rangeText = string.match(description, "%d*");																					
+					local rangeText = string.match(description, "%d+");	
+					if rangeText == nil or rangeText == '' then
+						description = DB.getText(nodeChild .. '.description');	
+						rangeText = string.match(description, "range%s%d+");
+						if rangeText == nil or rangeText == '' then
+							rangeText = string.match(description,"range%sof%s%d*");
+						end	
+						rangeText = string.match(rangeText, "%d+");
+					end
+					
 					medRange = rangeText;
 					maxRange = medRange;									
 				end
