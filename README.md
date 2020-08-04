@@ -1,7 +1,16 @@
 # FG-Token-Helper
 Fantasy Grounds Extension that has helper APIs for handling Tokens and their ranges on a battlemap in FG.
 
-Changelog / Added / Modified:
+## License
+
+This project is licensed under private License.
+The license is held by Styrmir Thorarinsson and some proprietary code supplied by SmiteWorks.
+
+This license extends to all use or inspiration of the whole or part of its work and code.
+
+This license overrides any licences written or supplied with any sub-extensions or code derived from this project.
+
+## Changelog / Added / Modified:
 Versioning: v(Major.Minor.Patch) https://en.wikipedia.org/wiki/Software_versioning
 
 v1.0.0 (March 11th, 2019)
