@@ -474,7 +474,7 @@ function getWeaponRanges5e(rActor, sRanged, sWeaponName)
 
 
 		-- PC handling
-		elseif (rActor.sType == 'pc') then			
+		elseif (rActor.sType == 'charsheet') then
 			-- db weapon entry on character sheet character example: charactersheet.id-00001.weaponlist.id-00001
 			-- name: .name
 			-- properties: .properties
